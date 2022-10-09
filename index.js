@@ -1,6 +1,7 @@
 // Installations
-fs = require('fs');
-inq = require ('inquirer');
+let fs = require('fs');
+let inq = require ('inquirer');
+let generateHTML = require('./lib/generateHTML')
 
 // Classes
 const Employee = require('./lib/Employee');
@@ -106,10 +107,13 @@ const questions = [
     },
     {
         type: 'confirm',
+        message: 'Do you want to confirm adding this team member? ',
+        name: 'confirmEmployee',
+    },
+    {
+        type: 'confirm',
         message: 'Do you have more team members to add? ',
         name: 'addEmployee',
-        // default: false,
-
     }
 
 
@@ -119,26 +123,29 @@ function getInput () {
     return inq
         .prompt(questions)
         .then(input => {
-            let teamMem;
-            switch (input.role) {
-                case "Employee":
-                    teamMem = new Employee (input.name, input.id, input.email);
-                    teamArray.push(teamMem);
-                    break;
-                case "Engineer":
-                    teamMem = new Engineer (input.name, input.id, input.email, input.github);
-                    teamArray.push(teamMem);
-                    break;
-                    case "Intern":
-                    teamMem = new Intern (input.name, input.id, input.email, input.school);
-                    teamArray.push(teamMem);
-                    break;
-                case "Manager":
-                    teamMem = new Manager (input.name, input.id, input.email, input.office);
-                    teamArray.unshift(teamMem);
-                    break;
+            if (!input.confirmEmployee && input.addEmployee){
+                return getInput();
+            } else {
+                let teamMem;
+                switch (input.role) {
+                    case "Employee":
+                        teamMem = new Employee (input.name, input.id, input.email);
+                        teamArray.push(teamMem);
+                        break;
+                    case "Engineer":
+                        teamMem = new Engineer (input.name, input.id, input.email, input.github);
+                        teamArray.push(teamMem);
+                        break;
+                        case "Intern":
+                        teamMem = new Intern (input.name, input.id, input.email, input.school);
+                        teamArray.push(teamMem);
+                        break;
+                    case "Manager":
+                        teamMem = new Manager (input.name, input.id, input.email, input.office);
+                        teamArray.unshift(teamMem);
+                        break;
+                }
             }
-            
             if (input.addEmployee){
                 return getInput();
             }
@@ -152,55 +159,11 @@ function getInput () {
         })
 }
 
-function cardBuilder (input) {
-    switch (input.role) {
-        case "Employee" :
-            return `<div class="card" style="width: 18rem;">
-        <div class="card-body">
-          <h5 class="card-title">${input.name}</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Employee</h6>
-          <p class="card-text">ID: ${input.id}</p>
-          <p class="card-text">Email: ${input.email}</p>
-        </div>
-      </div>`;
-        case "Engineer" :
-            return `<div class = "card" style = "width: 18rem;">
-            <div class = "card-body">
-              <h5 class = "card-title">${input.name}</h5>
-              <h6 class = "card-subtitle mb-2 text-muted">Engineer</h6>
-              <p class = "card-text">ID: ${input.id}</p>
-              <p class = "card-text">Email: ${input.email}</p>
-              <p class = "card-text">Github: <a href = "https://github.com/${input.github}">https://github.com/${input.github}</a></p>
-            </div>
-          </div>`
-        case "Intern" :
-            return `<div class = "card" style = "width: 18rem;">
-            <div class = "card-body">
-              <h5 class = "card-title">${input.name}</h5>
-              <h6 class = "card-subtitle mb-2 text-muted">Employee</h6>
-              <p class = "card-text">ID: ${input.id}</p>
-              <p class = "card-text">Email: ${input.email}</p>
-              <p class = "card-text">School Name: ${input.school}</p>
-            </div>
-          </div>`;
-        case "Manager" :
-            return `<div class = "card" style = "width: 18rem;">
-            <div class = "card-body">
-              <h5 class = "card-title">${input.name}</h5>
-              <h6 class = "card-subtitle mb-2 text-muted">Employee</h6>
-              <p class = "card-text">ID: ${input.id}</p>
-              <p class = "card-text">Email: ${input.email}</p>
-              <p class = "card-text">Office Number: ${input.school}</p>
-            </div>
-          </div>`
-    }
-}
-
 async function init () {
     const input = await getInput();
-    console.log(input)
-    // fs.writeFile('./dist/holmgang.txt', JSON.stringify(input), (err) =>
-    // err ? console.error(err) : console.log('Input logged!'))
+    const html = generateHTML(input)
+    fs.writeFile('./dist/index.html', html, (err) =>
+    err ? console.error(err) : console.log('Input logged!'))
 }
 
 init()
