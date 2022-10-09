@@ -3,10 +3,12 @@ fs = require('fs');
 inq = require ('inquirer');
 
 // Classes
-Employee = require('./lib/Employee');
-Engineer = require('./lib/Engineer');
-Intern = require('./lib/Intern');
-Manager = require('./lib/Manager');
+const Employee = require('./lib/Employee');
+const Engineer = require('./lib/Engineer');
+const Intern = require('./lib/Intern');
+const Manager = require('./lib/Manager');
+
+let teamArray = []
 
 const questions = [
     {
@@ -76,24 +78,75 @@ const questions = [
     },
     {
         type: 'input',
-        message: 'Please enter your intern\'s school: ',
+        message: 'Please enter your intern\'s school name: ',
         name: 'school',
         when: (input) => input.role === 'Intern',
         validate: (sInput) => {
             if (sInput) {
                 return true
             } else {
-                console.log(' Please enter your engineer\'s github username.')
+                console.log(' Please enter your intern\'s school name')
                 return false
             }
         }
+    },
+    {
+        type: 'number',
+        message: 'Please enter your manager\'s office number: ',
+        name: 'office',
+        when: (input) => input.role === 'Manager',
+        validate: (oInput) => {
+            if (Number.isInteger(oInput) && !Number.isNaN(oInput) && (Math.sign(oInput) === 1)) { //ensures that input is a positive integer
+                return true
+            } else {
+                console.log(' Please enter a valid office number.')
+                return false
+            }
+        }
+    },
+    {
+        type: 'confirm',
+        message: 'Do you have more team members to add? ',
+        name: 'addEmployee',
+        // default: false,
+
     }
 
 
 ]
 
 function getInput () {
-    return inq.prompt(questions)
+    return inq
+        .prompt(questions)
+        .then(input => {
+            let teamMem;
+            switch (input.role) {
+                case "Employee":
+                    teamMem = new Employee (input.name, input.id, input.email);
+                    teamArray.push(teamMem);
+                    break;
+                case "Engineer":
+                    teamMem = new Engineer (input.name, input.id, input.email, input.github);
+                    teamArray.push(teamMem);
+                    break;
+                    case "Intern":
+                    teamMem = new Intern (input.name, input.id, input.email, input.school);
+                    teamArray.push(teamMem);
+                    break;
+                case "Manager":
+                    teamMem = new Manager (input.name, input.id, input.email, input.office);
+                    teamArray.unshift(teamMem);
+                    break;
+            }
+            
+            if (input.addEmployee){
+                return getInput();
+            }
+            else {
+                return teamArray
+            }
+        })
+        
         .catch(err => {
             console.log(err)
         })
@@ -145,8 +198,9 @@ function cardBuilder (input) {
 
 async function init () {
     const input = await getInput();
-    fs.writeFile('./dist/holmgang.txt', JSON.stringify(input), (err) =>
-    err ? console.error(err) : console.log('Input logged!'))
+    console.log(input)
+    // fs.writeFile('./dist/holmgang.txt', JSON.stringify(input), (err) =>
+    // err ? console.error(err) : console.log('Input logged!'))
 }
 
 init()
