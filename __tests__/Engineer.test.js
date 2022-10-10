@@ -10,7 +10,7 @@ describe("Engineer", () => {
             expect(engineer.name).toEqual("Cody");
             expect(engineer.id).toEqual("C-2193");
             expect(engineer.email).toEqual("codysun91@gmail.com")
-            expect(engineer.github).toEqual("cpdysunshine")
+            expect(engineer.github).toEqual("codysunshine")
         });
 
         it("should return the name of the engineer when using the getName() method", () => {
@@ -41,31 +41,6 @@ describe("Engineer", () => {
             const engineer = new Engineer ("Jacob", "C-128", "jacoblassoman@gmail.com", "lassomanjacob");
 
             expect(engineer.getRole()).toEqual("Engineer");
-        });
-        
-        // Exception Tests
-        it("should throw an error if provided no arguments", () => {
-            const cb = () => new Engineer();
-
-            expect(cb).toThrow();
-        });
-
-        it("should throw an error if not provided a github username", () => {
-            const cb = () => new Engineer("Jonathan", "C-11", "jchow1948@gmail.com");
-
-            expect(cb).toThrow();
-        });
-        
-        it("should throw an error if not provided an email", () => {
-            const cb = () => new Engineer("Rayman", "C-121");
-
-            expect(cb).toThrow();
-        });
-
-        it("should throw an error if provided neither an email, nor an ID", () => {
-            const cb = () => new Engineer("Edward");
-
-            expect(cb).toThrow();
         });
     });
 });

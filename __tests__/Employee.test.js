@@ -35,24 +35,5 @@ describe("Employee", () => {
 
             expect(employee.getRole()).toEqual("Employee");
         });
-        
-        // Exception Tests
-        it("should throw an error if provided no arguments", () => {
-            const cb = () => new Employee();
-
-            expect(cb).toThrow();
-        });
-        
-        it("should throw an error if not provided an email", () => {
-            const cb = () => new Employee("Rayman", "B-121");
-
-            expect(cb).toThrow();
-        });
-
-        it("should throw an error if provided neither an email, nor an ID", () => {
-            const cb = () => new Employee("Edward");
-
-            expect(cb).toThrow();
-        });
     });
 });
