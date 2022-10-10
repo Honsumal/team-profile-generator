@@ -142,7 +142,7 @@ function getInput () {
                         break;
                     case "Manager":
                         teamMem = new Manager (input.name, input.id, input.email, input.office);
-                        teamArray.unshift(teamMem);
+                        teamArray.unshift(teamMem); // Adds manager to the top of the list
                         break;
                 }
             }
