@@ -22,7 +22,9 @@ Please ensure that these steps are taken to ensure the application runs smoothly
 
 ## Usage
 
-Run the following command in the command line ``` node index.js ```
+Run the following command in the CLI:
+
+ ``` node index.js ```
 
 Here is a screenshot of the completed application:
 
@@ -36,18 +38,17 @@ N/A
 
 ## License
 
-This application is covered by the MIT License.
-
-Here is a link to the above license detailing its use:
-
-https://choosealicense.com/licenses/mit
-
+N/A
 
 ## Tests
 
 To ensure that this application is working, please perform the following tests:
 
+Run the following command in the CLI:
 
+``` npm test ```
+
+This will run tests on the classes 'Employee', 'Engineer', 'Intern', and 'Manager' to ensure they are all working.
 
 ## Questions
 
