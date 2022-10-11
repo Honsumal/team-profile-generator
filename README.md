@@ -26,9 +26,9 @@ Run the following command in the CLI:
 
  ``` node index.js ```
 
-Here is a screenshot of the completed application:
+Here is a link a demo video of the application
 
-![Application Screenshot](assets/images/finished-webpage.png)
+https://watch.screencastify.com/v/ojpaj8rfCts8mFlTCT4F
 
 ## Contributors
 

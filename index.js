@@ -4,23 +4,89 @@ let inq = require ('inquirer');
 let generateHTML = require('./lib/generateHTML')
 
 // Classes
-const Employee = require('./lib/Employee');
+// const Employee = require('./lib/Employee');
 const Engineer = require('./lib/Engineer');
 const Intern = require('./lib/Intern');
 const Manager = require('./lib/Manager');
 
 let teamArray = []
 
+//Questions for Manager Input
+const mQuestions = [
+    {
+        type: 'input',
+        message: 'Please enter your name: ',
+        name: 'name',
+        validate: (nInput) => {
+            if (nInput){
+                return true
+            } else {
+                console.log(' Please enter the name of your team member.')
+                return false
+            }
+        }
+
+    },
+    {
+        type: 'input',
+        message: 'Please enter your ID: ',
+        name: 'id',
+        validate: (iInput) => {
+            if (iInput) {
+                return true
+            } else {
+                console.log(' Please enter the id of your team member.')
+                return false
+            }
+        }
+    },
+    {
+        type: 'input',
+        message: 'Please enter your email address: ',
+        name: 'email',
+        validate: (eInput) => {
+            if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(eInput)){ //obtained from regexr.com email address validation
+                return true
+            } else {
+                console.log(' Please enter a valid email address.')
+                return false
+            }
+        }
+    },
+    {
+        type: 'input',
+        message: 'Please enter your office number: ',
+        name: 'office',
+        validate: (oInput) => {
+            if (Number.isInteger(parseInt(oInput)) && !Number.isNaN(parseInt(oInput)) && (Math.sign(parseInt(oInput)) === 1)) { //ensures that input is a positive integer
+                return true
+            } else {
+                console.log(' Please enter a valid office number.')
+                return false
+            }
+        }
+    },
+    {
+        type: 'confirm',
+        message: 'Have you correctly added your information? ',
+        name: 'confirmEmployee',
+    },
+    {
+        type: 'confirm',
+        message: 'Do you have more team members to add? ',
+        name: 'addEmployee',
+    }
+]
+
+//Questions for Team Member Input
 const questions = [
     {
         type: 'list',
-        message: 'Please enter which role you team member holds: ',
+        message: 'Is your team member an engineer or an intern? : ',
         name: 'role',
         choices: [
-            'Employee',
             'Engineer',
             'Intern',
-            'Manager',
         ]
     },
     {
@@ -92,20 +158,6 @@ const questions = [
         }
     },
     {
-        type: 'number',
-        message: 'Please enter your manager\'s office number: ',
-        name: 'office',
-        when: (input) => input.role === 'Manager',
-        validate: (oInput) => {
-            if (Number.isInteger(oInput) && !Number.isNaN(oInput) && (Math.sign(oInput) === 1)) { //ensures that input is a positive integer
-                return true
-            } else {
-                console.log(' Please enter a valid office number.')
-                return false
-            }
-        }
-    },
-    {
         type: 'confirm',
         message: 'Do you want to confirm adding this team member? ',
         name: 'confirmEmployee',
@@ -115,39 +167,35 @@ const questions = [
         message: 'Do you have more team members to add? ',
         name: 'addEmployee',
     }
-
-
 ]
 
-function getInput () {
+function getInput (questionArray) {
     return inq
-        .prompt(questions)
+        .prompt(questionArray)
         .then(input => {
-            if (!input.confirmEmployee && input.addEmployee){
-                return getInput();
-            } else {
+            if (!input.confirmEmployee && input.addEmployee && teamArray.length === 0) { // Recurses onto Manager input 
+                return getInput(mQuestions)
+            } else if (!input.confirmEmployee && input.addEmployee) { //Recurses onto Team Member Input
+                return getInput(questions);
+            } else if (input.confirmEmployee) { //Adds team members
                 let teamMem;
                 switch (input.role) {
-                    case "Employee":
-                        teamMem = new Employee (input.name, input.id, input.email);
-                        teamArray.push(teamMem);
-                        break;
                     case "Engineer":
                         teamMem = new Engineer (input.name, input.id, input.email, input.github);
                         teamArray.push(teamMem);
                         break;
-                        case "Intern":
+                    case "Intern":
                         teamMem = new Intern (input.name, input.id, input.email, input.school);
                         teamArray.push(teamMem);
                         break;
-                    case "Manager":
+                    case undefined:
                         teamMem = new Manager (input.name, input.id, input.email, input.office);
                         teamArray.unshift(teamMem); // Adds manager to the top of the list
                         break;
                 }
             }
             if (input.addEmployee){
-                return getInput();
+                return getInput(questions);
             }
             else {
                 return teamArray
@@ -160,7 +208,8 @@ function getInput () {
 }
 
 async function init () {
-    const input = await getInput();
+    console.log ("Adding Manager Information")
+    const input = await getInput(mQuestions);
     const html = generateHTML(input)
     fs.writeFile('./dist/index.html', html, (err) =>
     err ? console.error(err) : console.log('Input logged!'))
